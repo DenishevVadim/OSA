@@ -1,0 +1,32 @@
+// hanoy.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
+//
+
+#include "pch.h"
+#include <iostream>
+#include <stack>
+using namespace std;
+
+
+void pyramid(stack<int> &first_peg, stack<int> &tree_peg, stack<int> &two_peg, int N) {
+	if (N == 0) return;
+	pyramid(first_peg, two_peg, tree_peg, N - 1);
+	tree_peg.push(first_peg.top());
+	first_peg.pop();
+	pyramid(two_peg, tree_peg, first_peg, N - 1);
+}
+
+
+int main()
+{
+	setlocale(LC_ALL, "rus");
+	int N;
+	stack<int> first_peg;
+	stack<int> two_peg;
+	stack<int> tree_peg;
+    cout << "Hello World!\n"; 
+	cin >> N;
+	for (int i = N; i > 0; i--) {
+		first_peg.push(i);
+	}
+	pyramid(first_peg, tree_peg, two_peg, N);
+}
