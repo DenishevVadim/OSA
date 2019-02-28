@@ -1,0 +1,86 @@
+#include"pch.h"
+#include <iostream>
+#include <string>
+#include <stack>
+#include <cctype>
+
+using namespace std;
+
+int main()
+{
+	setlocale(LC_ALL, "russian");
+	int prior(char ch);
+	stack<char> temp;
+	string in, out;
+	cout << "Введите выражение: ";
+	getline(cin, in);
+
+	for (size_t i = 0; i < in.size(); i++)
+	{
+
+		if (isdigit(in[i]) || isalpha(in[i]))
+			out.push_back(in[i]);
+		else
+			if ((in[i] == '+') || (in[i] == '-') || (in[i] == '*') || (in[i] == '/') || (in[i] == '^'))
+			{
+				if (!temp.empty() && prior(in[i]) > prior(temp.top())) {
+					temp.push(in[i]);
+				}
+				else {
+					while (!temp.empty() && prior(temp.top()) >= prior(in[i])) {
+						out.push_back(temp.top());
+						temp.pop();
+					}
+					temp.push(in[i]);
+				}
+			}
+			else if (in[i] == '(') {
+				temp.push(in[i]);
+			}
+			else if (in[i] == ')') {
+				while (!temp.empty() && temp.top() != '(') {
+					out.push_back(temp.top());
+					temp.pop();
+				}
+				if (!temp.empty() && temp.top() == '(') {
+					temp.pop();
+				}
+				else {
+					cout << "Неверный ввод!\n";
+					return 0;
+				}
+			}
+			else {
+				temp.push(in[i]);
+			}
+	}
+	while (!temp.empty()) {
+		if (temp.top() != '(') {
+			out.push_back(temp.top());
+			temp.pop();
+		}
+		else {
+			cout << "Неверный ввод!\n";
+			return 0;
+		}
+	}
+	cout << "ОПЗ: " << out << endl;
+}
+int prior(char ch) {
+	switch (ch) {
+	case '(':
+		return 0;
+	case '+':
+		return 1;
+	case '-':
+		return 1;
+	case '*':
+		return 2;
+	case '/':
+		return 2;
+	case '^':
+		return 3;
+	default:
+		return 4;
+	}
+}
