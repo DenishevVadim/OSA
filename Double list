@@ -1,0 +1,220 @@
+#include "pch.h"
+#include <iostream>
+#include <string>
+#include <iomanip> 
+#include <windows.h>
+using std::string;
+using namespace std;
+struct list
+{
+	int stip;
+	int group;
+	int rec_book;
+	string *fam;
+	struct list *next; // указатель на следующий элемент
+	struct list *prev; // указатель на предыдущий элемент
+};
+
+struct list * init( int stip, int group, int rec_book, string *fam)  // Создание корня
+{
+	struct list *lst;
+	// выделение памяти под корень списка
+	lst = (struct list*)malloc(sizeof(struct list));
+	lst->stip = stip;
+	lst->group = group;
+	lst->rec_book = rec_book;
+	lst->fam = new string;
+	*lst->fam = *fam;
+	lst->next = NULL; // указатель на следующий узел
+	lst->prev = NULL; // указатель на предыдущий узел
+	return(lst);
+}
+struct list * addelem(list *lst, string fam, int stip, int group, int rec_book) // добавление узла после текущего
+{
+	struct list *temp, *p;
+	temp = init(stip, group, rec_book, &fam);
+	p = lst->next; // сохранение указателя на следующий узел
+	lst->next = temp; // предыдущий узел указывает на создаваемый
+
+	
+	temp->next = p; // созданный узел указывает на следующий узел
+	temp->prev = lst; // созданный узел указывает на предыдущий узел
+	if (p != NULL)
+		p->prev = temp;
+	return(temp);
+}
+
+
+struct list * deletelem(list *lst) // удаление текущего узла 
+{
+	struct list *prev, *next;
+	prev = lst->prev; 
+	next = lst->next; 
+	if (prev != NULL)
+		prev->next = lst->next; // Меняем указатели 
+	if (next != NULL)
+		next->prev = lst->prev; 
+	free(lst); // освобождаем память
+	return(prev);
+}
+
+
+struct list * deletehead(list *root) // удаление корня
+{
+	struct list *temp;
+	temp = root->next;
+	temp->prev = NULL;
+	free(root);   // освобождение памяти текущего корня
+	return(temp); // новый корень списка
+}
+
+void listprint(list *lst) // вывод элементов
+{
+	struct list *p;
+	p = lst;
+	do {
+		//printf("%d ", p->field); // вывод значения элемента p
+		p = p->next; // переход к следующему узлу
+	} while (p != NULL); // условие окончания обхода
+}
+
+void print_cur(list *cur){
+
+	cout <<"Студент найден "<< "   Фамилия:" << *cur->fam << "   Группа:" << cur->group << "   Зачетка:" << cur->rec_book << "   Стипендия:" << cur->stip << endl;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	list *head, *cur;
+	int g = 0,search,flag=1;
+	string fam;
+	head = init(100, 181722, 1821071, &(string)"Денишев"); //Создание головы списка
+	cur = head;
+	int stip, group, menu, rec_book;
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+	
+	cout << "1)Процедура удаления текущего узла \n2)Процедура обхода и вывода списка на экран \n3)Процедура поиска данных в списке по фамилии, стипендии, группе, номеру зачетной книжки \n4)Добавление данных о студеньте\n5)Выход\n";
+	do {
+
+		cout << "Выбор : ";
+		cin >> menu;
+		switch (menu) {
+		case 1: {
+			//удаление
+			cur = deletelem(cur);
+			break;
+		}
+		case 2: {
+			//вывод на экран
+			cur = head;
+			cout << setiosflags(ios::left);
+			cout << setw(15) << "Фамилия" << setw(15) << "Группа" << setw(15) << "Зачетка" << setw(15) << "Стипендия" << endl;
+			cout << setw(15) << *cur->fam << setw(15) << cur->group << setw(15) << cur->rec_book << setw(15) << cur->stip << endl;
+			while (cur->next != NULL) // проходимся по всему листу выводя каждое значение
+			{
+				cur = cur->next;
+				cout << setw(15) << *cur->fam << setw(15) << cur->group << setw(15) << cur->rec_book << setw(15) << cur->stip<< endl;
+			}
+			break;
+		}
+		case 3: {
+			cout << "поиск по: 1)Фамилии 2)Стипендии 3)Группе 4)Зачетке\n";
+			cout << "поиск по: ";
+			flag = 1;
+			cin >> search;
+			cur = head;
+			switch (search){
+			case 1: {
+				cin >> fam;
+				while (cur != NULL) {
+					if (*cur->fam == fam) {
+						print_cur(cur);
+						flag = 0;
+					}
+					
+					cur = cur->next;
+				}
+
+				if (flag == 1) {
+					cout << "Студент не был найден";
+				}
+				break;
+			}
+			
+			case 2: {
+				cin >> stip;
+				while (cur != NULL) {
+					if (cur->stip == stip) {
+						print_cur(cur);
+						flag = 0;
+					}
+					cur = cur->next;
+				}
+
+				if (flag == 1) {
+					cout << "Студент не был найден";
+				}
+				break;
+			}
+			case 3: {
+				cin >> group;
+				while (cur != NULL) {
+					if (cur->group == group) {
+						print_cur(cur);
+						flag = 0;
+					}
+					cur = cur->next;
+				}
+
+				if (flag == 1) {
+					cout << "Студент не был найден";
+				}
+				break;
+			}
+			case 4: {
+				cin >> rec_book;
+				while (cur != NULL) {
+					if (cur->rec_book == rec_book) {
+						print_cur(cur);
+						flag = 0;
+					}
+					cur = cur->next;
+				}
+
+				if (flag == 1) {
+					cout << "Студент не был найден";
+				}
+				break;
+			}
+			default:
+				break;
+			}
+			break;
+		}
+		case 4: {
+			//добавление
+			cout << "Фамилия :";
+			cin >> fam;
+			cout << "Стипендия :";
+			cin >> stip;
+			cout << "Группа :";
+			cin >> group;
+			cout << "Зач. книжка :";
+			cin >> rec_book;
+			cur = addelem(cur, (string)fam, stip, group, rec_book);
+			break;
+		}
+		case 5: {
+			//выход
+			break;
+		}
+
+		default:
+			break;
+		}
+	} while (menu != 5);
+	
+	return 0;
+}
